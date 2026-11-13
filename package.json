@@ -1,0 +1,19 @@
+{
+  "name": "beon-qa-automation",
+  "private": true,
+  "description": "API and UI automation exercise for Restful-Booker and SauceDemo",
+  "scripts": {
+    "cy:open": "cypress open",
+    "test": "cypress run",
+    "test:api": "cypress run --spec cypress/e2e/api/**/*.cy.ts",
+    "test:ui": "cypress run --spec cypress/e2e/ui/**/*.cy.ts",
+    "test:api:headed": "cypress run --headed --spec cypress/e2e/api/**/*.cy.ts",
+    "test:ui:headed": "cypress run --headed --spec cypress/e2e/ui/**/*.cy.ts"
+  },
+  "devDependencies": {
+    "@testing-library/cypress": "^10.1.3",
+    "cypress": "^14.5.4",
+    "cypress-mochawesome-reporter": "^5.0.0",
+    "typescript": "^5.8.3"
+  }
+}

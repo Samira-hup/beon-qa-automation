@@ -1,0 +1,70 @@
+---
+description: Clean Cypress standards for this project
+alwaysApply: true
+---
+
+# Project standards
+
+## Read this file first
+
+Before any change in this project, read `.cursor/rules/project-standards.mdc` and follow every rule in it exactly. Do not edit code, docs, steps, or reports until this file has been read.
+
+## Documentation
+
+`.cursor/DOCUMENTATION.md` is the project documentation. It holds the QA Automation Exercise brief. The finished project must follow what that file asks for: the Restful-Booker lifecycle, the SauceDemo checkout, the README, the manual bug report, and the reporting setup.
+
+## Templates
+
+Every feature request, bug, defect, and user story created in this project must follow its template exactly. Same sections, same order, nothing added, nothing removed.
+
+- Feature request: `.cursor/TEMPLATES/feature-requests.md`
+- Bug: `.cursor/TEMPLATES/bugs.md`
+- Defect: `.cursor/TEMPLATES/defects.md`
+- User story: `.cursor/TEMPLATES/user-stories.md`
+
+## Language
+
+Write every project artifact in English. That includes code, comments, `cy.step` text, assertion messages, the README, bug reports, and these rules.
+
+## Clean code
+
+- Keep the code simple and easy to read.
+- Follow Cypress and Testing Library practices.
+- Do not add data structures, helpers, or layers the flow does not need.
+- One page object per screen. The spec owns the steps and the status assertions.
+
+## Steps
+
+Start every action in a spec with `cy.step` and an English description, then perform the action.
+
+## Locators
+
+Query every element with `@testing-library/cypress`. These commands wrap the `getBy*` queries and retry:
+
+- `cy.findByTestId` for the `data-test` attribute
+- `cy.findByRole`, `cy.findByText`, `cy.findByLabelText`, or `cy.findByPlaceholderText` when the check is the role or the text
+
+Do not locate elements with `cy.get`, `cy.contains`, CSS, or XPath.
+
+```typescript
+// Bad
+cy.get('[data-test="login-button"]').click();
+
+// Good
+cy.step('Log in');
+cy.findByTestId('login-button').click();
+```
+
+## Architecture
+
+Each spec reads as the business flow. `cy.step` names every action in the runner and in the report. `cy.login()` submits the SauceDemo form with the selected environment user and continues only when the inventory page is loaded. Pass a username and password only to override that user.
+
+- `cypress/e2e/api/booking-lifecycle.cy.ts` chains auth, create, read, update, and delete. The spec checks the status codes (200, 201, 404). If a step fails after the booking exists, `afterEach` deletes it.
+- `cypress/support/api/booking.ts` is the HTTP client. Update and delete send `Cookie: token=...`. Update also sends `Accept: application/json`.
+- `cypress/e2e/ui/checkout.cy.ts` logs in, adds two products, checks the cart, checks the overview, and finishes the order.
+- `cypress/support/pages` is one page object per screen. Locators are Testing Library queries. `findByTestId` reads the `data-test` attribute.
+- `cypress/support/data/urls.ts` stores the UI and API addresses for QA, dev, sandbox, and stage, and resolves `ENVIRONMENT` (default `qa`). The Cypress config uses that value to set `baseUrl`.
+- `cypress/support/data/users.ts` stores SauceDemo and Restful-Booker users per environment in `EnvironmentUsers`. QA holds the real accounts. Dev, sandbox, and stage are simulated.
+- `cypress/support/data/environment.ts` reads the selected environment in the browser and returns its URLs and users. `cy.login()` with no arguments uses the selected UI user. The API client uses the selected API address and user.
+
+Bugs found by hand are in `.cursor/BUGS`.
